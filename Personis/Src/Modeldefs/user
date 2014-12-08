@@ -41,6 +41,7 @@
 # ==viewname: list of components from current context
 #	create a view in the current context
 ==fullname: firstname, lastname
+==gender: gender
 
 @@Personal/Health: description="Health information"
 --weight: type="attribute", value_type="number", description="My Weight", [evidence_type="explicit", value="75", flags=["goal"]]
