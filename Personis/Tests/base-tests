@@ -55,30 +55,32 @@ then
 	more error*
 fi
 
+python Tests/unit-tests.py
+
 #
 # Run the Base tests
-test -s $HOME/.personis_server.conf || cp Src/personis_serverDEV.conf $HOME/.personis_server.conf
-test -s $HOME/.personis.conf || cp Src/personisDEV.conf $HOME/.personis.conf
-echo "Test number? (CR for all, ctrl-C if none)"
-read TESTS
-echo Running tests...
-if [ z$TESTS == z ]
-then
-	TESTS="[0-9][0-9]"
-fi
-for file in Tests/Base/example${TESTS}_*.py
-do
-	echo
-        echo ====================================================================
-        echo "                          "$file
-        echo ====================================================================
-
-	python $file
-	echo "Continue?"
-	read x
-done
-
-echo
-echo =================
-echo All Done.
-echo =================
+# test -s $HOME/.personis_server.conf || cp Src/personis_serverDEV.conf $HOME/.personis_server.conf
+# test -s $HOME/.personis.conf || cp Src/personisDEV.conf $HOME/.personis.conf
+# echo "Test number? (CR for all, ctrl-C if none)"
+# read TESTS
+# echo Running tests...
+# if [ z$TESTS == z ]
+# then
+# 	TESTS="[0-9][0-9]"
+# fi
+# for file in Tests/Base/example${TESTS}_*.py
+# do
+# 	echo
+#         echo ====================================================================
+#         echo "                          "$file
+#         echo ====================================================================
+# 
+# 	python $file
+# 	echo "Continue?"
+# 	read x
+# done
+# 
+# echo
+# echo =================
+# echo All Done.
+# echo =================
