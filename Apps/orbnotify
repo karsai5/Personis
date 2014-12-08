@@ -1,0 +1,13 @@
+#!/bin/sh
+
+wget -o logfile -O result http://www.it.usyd.edu.au/~bob/ptest.cgi?check
+
+if grep -i OK result
+then
+	echo green
+	wget http://129.78.111.69:2005/colour=green,pulse=none,brightness=low
+else
+	echo red
+	wget http://129.78.111.69:2005/colour=red,pulse=none,brightness=low
+fi
+

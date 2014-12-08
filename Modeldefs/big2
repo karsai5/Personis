@@ -1,0 +1,18 @@
+
+@@Personal:
+--gender:  Description= "Gender" ,  component_type= "attribute" ,  value= "None" ,  value_type= "string" ,  resolver= "None" ,  objectType= "Component" 
+--email:  Description= "email address" ,  component_type= "attribute" ,  value= "None" ,  value_type= "string" ,  resolver= "None" ,  objectType= "Component" , rule=" <default!./Personal/email> ~ '*' : NOTIFY 'http://www.somewhere.com/' 'email=' <./Personal/email>"
+--firstname:  Description= "First name" ,  component_type= "attribute" ,  value= "None" ,  value_type= "string" ,  resolver= "None" ,  objectType= "Component" 
+--lastname:  Description= "Last name" ,  component_type= "attribute" ,  value= "None" ,  value_type= "string" ,  resolver= "None" ,  objectType= "Component" , rule=" <default!./Personal/lastname> ~ '.*' : NOTIFY 'http://www.it.usyd.edu.au/~bob/Personis/tst.cgi?' 'lastname=' <./Personal/lastname> "
+==fullname: Identifier= "fullname" ,  Description= "" ,  component_list= [ "firstname" ,  "lastname" ] ,  objectType= "View" 
+
+@@Personal/Health:
+--weight_goal:  goal= "None" ,  component_type= "goal" ,  value= "None" ,  value_type= "string" ,  resolver= "None" ,  Description= "My goal weight" ,  objectType= "Component" 
+--notes:  Description= "Health notes" ,  component_type= "attribute" ,  value= "None" ,  value_type= "string" ,  resolver= "None" ,  objectType= "Component" , rule=" <default!./Personal/Health/notes> ~ '.*' : NOTIFY 'http://www.it.usyd.edu.au/~bob/Personis/savenote.cgi?' 'note=' <./Personal/Health/notes> "
+--sleep:  Description= "Sleep info" ,  component_type= "attribute" ,  value= "None" ,  value_type= "string" ,  resolver= "None" ,  objectType= "Component" 
+--weight:  Description= "My weight" ,  component_type= "attribute" ,  value= "None" ,  value_type= "number" ,  resolver= "None" ,  objectType= "Component" 
+--pulse:  Description= "Heart pulse (bpm)" ,  component_type= "attribute" ,  value= "None" ,  value_type= "number" ,  resolver= "None" ,  objectType= "Component"
+
+@@Personal/Health/Medications:
+--taken:  Description= "Time medications last taken" ,  component_type= "attribute" ,  value= "None" ,  value_type= "string" ,  resolver= "None" ,  objectType= "Component" , rule=" <default!./Personal/Health/Medications/taken> ~ 'taken' : NOTIFY 'http://rinax.it.usyd.edu.au:2055/colour=green,pulse=none,brightness=low' "
+--details:  Description= "Details of medications" ,  component_type= "attribute" ,  value= "None" ,  value_type= "string" ,  resolver= "None" ,  objectType= "Component"

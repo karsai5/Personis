@@ -1,0 +1,54 @@
+
+# model structure:
+
+/HechtMuseum/
+	Locations/
+		placename	presentation
+		eg Menorah		p204
+	Presentations/
+		presentation	place | metadata | question
+		eg p204		Menorah
+		eg p204		people
+		eg p204		"Blah blah?"
+
+/User/Apps/HechMuseum/
+	location	placename
+			eg Menorah
+	user-id		museumUserCode
+	presentation	presentation played | presentation stopped | presentation rating
+			eg p204 played
+			eg p204 rating 2
+	metadata	metaname rating
+			eg people 2
+	
+#######
+#
+# prog run when user is detected at new location.
+# find available presentations and rank them for this user
+
+placename = location argument
+
+ask /HechtMuseum/Locations/placename -> presentations
+for each pres
+	ask /HechtMuseum/Presentations/pres -> metadata + question
+	ask /User/Apps/HechtMuseum/presentations -> pres ratings
+	ask /User/Apps/HechtMuseum/metadata -> metaname ratings
+	calculate score from pres and metadat interaction scores
+
+display (ordered by score) list of questions, metadata and links to presentations 
+#
+#######
+
+#######
+#
+# prog run when a presentation is played, stopped or rated
+
+ask perspectives = Presentations/Perspectives/pres
+
+tell presentationname played|stopped|rating -> /User/Apps/HechtMuseum/presentation
+ask /HechtMuseum/Presentations/presentationname -> metadata
+for each metadataname
+	tell metadataname played|stopped|rating -> /User/Apps/HechtMuseum/metadata
+#
+#######
+

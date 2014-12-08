@@ -1,0 +1,37 @@
+--p204:type="attribute", value_type="string", description="Information about presentations",
+	[evidence_type="explicit", value="question What does the symbol of menorah represent in Jewish culture?"],
+	[evidence_type="explicit", value="place MenorahJewishEpigraphy"],
+	[evidence_type="explicit", value="meta people"],
+	[evidence_type="explicit", value="meta use"]
+--p205:type="attribute", value_type="string", description="Information about presentations",
+	[evidence_type="explicit", value="question What is the funerary context of the menorah according to finding in Beit Shearim?"],
+	[evidence_type="explicit", value="place MenorahJewishEpigraphy"],
+	[evidence_type="explicit", value="meta general"],
+	[evidence_type="explicit", value="meta overview"]
+--p206:type="attribute", value_type="string", description="Information about presentations",
+	[evidence_type="explicit", value="question How does the Menorah appear as a decorative motif?"],
+	[evidence_type="explicit", value="place MenorahJewishEpigraphy"],
+	[evidence_type="explicit", value="meta technology"],
+	[evidence_type="explicit", value="meta use"]
+--p207:type="attribute", value_type="string", description="Information about presentations",
+	[evidence_type="explicit", value="question How is the menorah symbol related to themes in the museum?"],
+	[evidence_type="explicit", value="place MenorahJewishEpigraphy"],
+	[evidence_type="explicit", value="meta general"],
+	[evidence_type="explicit", value="meta museology"]
+--p208:type="attribute", value_type="string", description="Information about presentations",
+	[evidence_type="explicit", value="question How did the cult of Heracles develop?"],
+	[evidence_type="explicit", value="place JewishEpigraphy"],
+	[evidence_type="explicit", value="meta general"],
+	[evidence_type="explicit", value="meta history"]
+--p209:type="attribute", value_type="string", description="Information about presentations",
+	[evidence_type="explicit", value="question How are the myths of Heracles expressed in his presentations?"],
+	[evidence_type="explicit", value="place JewishEpigraphy"],
+	[evidence_type="explicit", value="meta general"],
+	[evidence_type="explicit", value="meta history"]
+--p210:type="attribute", value_type="string", description="Information about presentations",
+	[evidence_type="explicit", value="question How is Heracles presented in the museum? "],
+	[evidence_type="explicit", value="place JewishEpigraphy"],
+	[evidence_type="explicit", value="meta general"],
+	[evidence_type="explicit", value="meta museology"]
+
+

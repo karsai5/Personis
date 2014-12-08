@@ -1,0 +1,66 @@
+
+# model structure:
+
+HechtMuseum/
+	location
+	user-id
+	Locations/
+		Presentations/
+			placename	list of presentations
+			Menorah		p204,p205
+		Interaction/
+			placename	start/stop/rate
+			Menorah		start
+	Presentations/
+		Locations/
+			pres		placename
+			p204		Menorah
+		Interaction/
+			pres		start/stop/rate
+			p204		start
+		Perspectives/
+			pres		list of perspectives
+			p204		people,technology
+		Questions/
+			pres		question
+			p204		"Blah blah?"
+	Perspectivees/
+		Interaction/
+			perspect	start/stop/rate
+			people		start
+#######
+#
+# prog run when user is detected at new location.
+# find available presentations and rank them for this user
+
+placename = location argument
+
+#
+ask Locations/Presentations/placename
+extract presentations
+for each pres
+	ask Presentations/Perspectives/pres
+	extract perspectives
+	for each perspective
+		ask Perspectives/Interaction/prespective (use a resolver to return single rating value)
+	ask Presentations/Questions/pres
+	extract question
+	ask Presentations/Interaction/pres (use a resolver to return single rating value)
+	calculate score from pres and perspective interaction scores
+
+display (ordered by score) list of questions, perspectives and links to presentations 
+#
+#######
+
+#######
+#
+# prog run when a presentation is played, stopped or rated
+
+ask perspectives = Presentations/Perspectives/pres
+
+tell played|stopped|rating -> Presentations/Interaction/pres
+for pers in perspectives
+	tell played|stopped|rating -> Perspectives/Interaction/pers
+#
+#######
+

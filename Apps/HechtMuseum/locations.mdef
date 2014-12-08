@@ -1,0 +1,9 @@
+--MenorahJewishEpigraphy: type="attribute", value_type="string", description="presentations at this location", 
+	[evidence_type="explicit", value="p204"],
+	[evidence_type="explicit", value="p205"],
+	[evidence_type="explicit", value="p206"],
+	[evidence_type="explicit", value="p207"]
+--RomanDivinitiesStatuettes: type="attribute", value_type="string", description="presentations at this location", 
+	[evidence_type="explicit", value="p208"],
+	[evidence_type="explicit", value="p209"],
+	[evidence_type="explicit", value="p210"]

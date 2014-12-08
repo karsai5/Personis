@@ -1,0 +1,21 @@
+--p204: type="attribute", value_type="string", description="perspectives for this presentation", 
+[evidence_type="explicit", value="people"],
+[evidence_type="explicit", value="use"]
+--p205: type="attribute", value_type="string", description="perspectives for this presentation", 
+[evidence_type="explicit", value="general"],
+[evidence_type="explicit", value="overview"]
+--p206: type="attribute", value_type="string", description="perspectives for this presentation", 
+[evidence_type="explicit", value="technology"],
+[evidence_type="explicit", value="use"]
+--p207: type="attribute", value_type="string", description="perspectives for this presentation", 
+[evidence_type="explicit", value="general"],
+[evidence_type="explicit", value="museology"]
+--p208: type="attribute", value_type="string", description="perspectives for this presentation", 
+[evidence_type="explicit", value="general"],
+[evidence_type="explicit", value="history"]
+--p209: type="attribute", value_type="string", description="perspectives for this presentation", 
+[evidence_type="explicit", value="general"],
+[evidence_type="explicit", value="history"]
+--p210: type="attribute", value_type="string", description="perspectives for this presentation", 
+[evidence_type="explicit", value="general"],
+[evidence_type="explicit", value="museology"]

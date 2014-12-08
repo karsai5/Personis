@@ -1,0 +1,7 @@
+
+login bob pass1
+# show 5 evidence items
+set evnum 5
+server
+model bob@s1.personis.info:2001
+ls

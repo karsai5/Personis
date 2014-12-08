@@ -1,0 +1,7 @@
+#!/bin/sh
+
+export PYTHONPATH=$HOME/LLUM/PersonisLite/Src:$PYTHONPATH
+
+date >>/home/bob/log
+env >>/home/bob/log
+/usr/bin/python2.5 /home/bob/LLUM/Apps/wweight.py 2>&1 >>/home/bob/log

@@ -1,0 +1,77 @@
+#!/usr/bin/python
+
+import sys, os, time, datetime
+
+sys.path.extend(['/home/bob/LLUM/PersonisLite/Src'])
+
+import Personis, Personis_base
+
+def form1(line):
+	if len(line) < 28:
+		return (None,None)
+	if line[0] in 'SMTWF':
+		try:
+			d = time.strptime(line[:28], '%a %b %d %H:%M:%S %Z %Y')
+		except:
+			#print 'bad format',line
+			return (None,None)
+	else:
+		return (None,None)
+	w = ""
+	for c in line[29:]:
+		if c in '1234567890.':
+			w += c
+		else:
+			break
+	if w == "":
+		return (d,None)
+	w = float(w)
+	if w < 50.0:
+		return (d,None)
+	return (d,w)
+	
+def form2(line):
+	if len(line) < 10:
+		return (None,None)
+	if line[0] in '0123456789':
+		try:
+			d = time.strptime(line[:8], '%m/%d/%y')
+		except:
+			#print 'bad format',line
+			return (None,None)
+	else:
+		return (None,None)
+	w = ""
+	for c in line[10:]:
+		if c in '1234567890.':
+			w += c
+		else:
+			break
+	if w == "":
+		return (d,None)
+	w = float(w)
+	if w < 50.0:
+		return (d,None)
+	return (d,w)
+
+def addweight(um,d,w):
+	ev = Personis_base.Evidence(source="judy", evidence_type="given", value=w, time=d)
+	print "%s %f" % (time.ctime(d), w)
+	um.tell(context=["Personal", "Health"], componentid='weight', evidence=ev)
+	
+f = open('judy-weight')
+
+um = Personis.Access(model="judy", user='judy')
+
+for line in f.readlines():
+	line = line[:-1]
+	(d,w) = form1(line)
+	if w != None:
+		#print "F1[%f]%s" % (w,time.ctime(time.mktime(d)))
+		addweight(um, time.mktime(d),w)
+		continue
+	(d,w) = form2(line)
+	if w != None:
+		#print "F2[%f]%s" % (w,time.ctime(time.mktime(d)))
+		addweight(um, time.mktime(d),w)
+		continue

@@ -1,0 +1,8 @@
+#!/bin/sh
+
+export PYTHONPATH=$HOME/LLUM/PersonisLite/Src:$PYTHONPATH
+export PYTHONPATH=$HOME/LLUM/Apps:$PYTHONPATH
+
+date >>/home/bob/log
+echo "Pillmsg" >>/home/bob/log
+/usr/bin/python2.5 /home/bob/LLUM/Apps/pillmsg.py 2>&1 >>/home/bob/log

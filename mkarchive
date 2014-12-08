@@ -1,0 +1,4 @@
+#!/bin/bash
+
+set -x
+hg archive $HOME/Personis-%R.tgz

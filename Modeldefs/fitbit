@@ -1,0 +1,23 @@
+
+# 
+# model definition for the fitbit glue app
+#
+
+#Notes: 
+# ComponentTypes = ["attribute", "activity", "knowledge", "belief", "preference", "goal"]
+# ValueTypes = ["string", "number", "boolean", "enum", "JSON"]
+
+
+@@Apps/Fitbit: description="Context containing data from the fitbit service"
+--user_id: type="attribute", value_type="string",description="fitbit user id"
+--sid: type="attribute", value_type="string",description="fitbit sid"
+--uid: type="attribute", value_type="string",description="fitbit uid"
+--uis: type="attribute", value_type="string",description="fitbit uis"
+--steps: type="attribute", value_type="number",description="number of steps take in a 5 minute period"
+--calories: type="attribute", value_type="number",description="calories burned in a 5 minute period"
+--activity: type="attribute", value_type="number",description="activity score in a 5 minute period"
+
+
+@@Devices: description="dummy"
+--fitbit: type="attribute", value_type="string",description="Fitbit device context"
+
