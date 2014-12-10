@@ -291,6 +291,69 @@ class SimpleTests(unittest.TestCase):
         (cobjlist, contexts, theviews, thesubs) = info # enter tuple info in variables
         self.assertEqual(contexts, ['Health'])
 
+    def test_create_app_and_test_permissions(self):
+        """
+        Creates an app called MyHealth and gives it ask but not tell permissions.
+        Ask for the permissions of an unregistered app as well as deleting the 
+        original MyHealth app.
+        """
+
+        # Create an app
+        try:
+            key = Personis_base.generate_app_key("MyHealth")
+            fingerprint = Personis_base.generate_app_fingerprint(key)
+            Personis_base.AppRequestAuth(model='Alice', modeldir='Tests/Models', 
+                    app='MyHealth', key=key.publickey().exportKey(), 
+                    description="My Health Manager")
+        except Exception as e:
+            print "App auth request failed with exception : %s\n" % (e)
+
+        # Check fingerprints match
+        requests = self.um.listrequests()
+        fingerprint2 = requests['MyHealth']['fingerprint']
+
+        if fingerprint2 != fingerprint:
+            self.assertTrue(False)
+        else:
+            self.assertTrue(True)
+
+        # Register app
+        appdetails = self.um.registerapp(app="MyHealth", desc="My Health Manager", 
+                fingerprint=fingerprint)
+
+        # Check app was registered
+        apps = self.um.listapps()
+        self.assertEqual(apps, {'MyHealth': {'description': 'My Health Manager'}})
+
+        # Give app permissions
+        self.um.setpermission(context=["Personal"], app="MyHealth", 
+                permissions={'ask':True, 'tell':False})
+
+        # Check permissions are correct
+        perms = self.um.getpermission(context=["Personal"], app="MyHealth")
+        self.assertEqual(perms['ask'], True)
+        self.assertEqual(perms['tell'], False)
+        
+        # Delete the MyHealth app
+        try:
+                self.um.deleteapp(app="MyHealth")
+        except Exception as e:
+                print "deleteapp failed with exception : %s\n" % (e)
+
+        # Check there's no registered apps
+        apps = self.um.listapps()
+        self.assertEqual(apps, {})
+
+    def test_get_permissions_of_unregistered_app(self):
+        """ 
+        Simply asks for the permissions of an app that hasn't been registered
+        """
+
+        # Ask for permissions of unregistered app, should throw ValueError
+        with self.assertRaises(ValueError):
+            perms = self.um.getpermission(context=['Personal'], app='withings')
+
+
 @contextlib.contextmanager
 def nostdout():
     """
