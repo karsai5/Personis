@@ -1,5 +1,7 @@
 /Personis/Tests/Models/
 /Personis/output_alice
 
+*.pyc
+
 *.un~
 *.swp
