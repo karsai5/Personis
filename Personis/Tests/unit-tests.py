@@ -10,7 +10,7 @@ import json
 
 import Personis_a
 import Personis_base
-from Personis_util import printcomplist, showobj
+from Personis_util import printcomplist, showobj, printjson
 from Personis_mkmodel import *
 
 class SimpleTests(unittest.TestCase):
@@ -296,7 +296,7 @@ class SimpleTests(unittest.TestCase):
         self.assertEqual(len(reslist), 1)
         self.assertEqual(reslist[0].value, 'home')
 
-    def test_show_contex(self):
+    def test_show_context(self):
         """
         Shows information about the context such as, sub-contexts, views for 
         that context and subscriptions to the context.
@@ -510,18 +510,81 @@ class SimpleTests(unittest.TestCase):
         self.assertEqual(apps,{})
 
     def test_add_json_content_to_component(self):
+        """
+        Adds a person to the People component using just a json object 
+        """
 
-        print "add a JSON encoded value to a component"
-        fullname = {'firstname':'Alice', 'lastname':'Smith'}
+        # add a JSON encoded value to a component
+        fullname = {'firstname':'James', 'lastname':'Bond'}
         # create a piece of evidence with json encoded value
         ev = Personis_base.Evidence(evidence_type="explicit", value=json.dumps(fullname))
         self.um.tell(context=["People"], componentid='fullname', evidence=ev)
 
-        print "==================================================================="
-        print "Now check the evidence list "
+        # Now check the evidence list
         reslist = self.um.ask(context=["People"], view=['fullname'])
-        printcomplist(reslist, printev = "yes")
+        self.assertEqual(len(reslist), 1)
+        self.assertEqual(reslist[0].value, 
+                '{"lastname": "Bond", "firstname": "James"}')
 
+    def test_output_json(self):
+
+        um = Personis_a.Access(model="Alice", modeldir=self.modeldir, 
+                authType='user', auth='alice:secret')
+        # export a model sub tree to JSON
+        with self.nostdout():
+            modeljson = um.export_model(["Personal"], resolver="default")
+        #modeljson = um.export_model(["Personal"])
+        # printjson(modeljson)
+
+        with self.nostdout():
+            um.import_model(context=["Temp"], partial_model=modeljson)
+        #um.import_model(partial_model=modeljson)
+
+        modeljson = um.export_model(["Temp"])
+        # printjson(modeljson)
+
+    def test_output_json2(self):
+
+        # export a model sub tree to JSON
+
+        um = Personis_a.Access(model="Alice", modeldir=self.modeldir, 
+                authType='user', auth='alice:secret')
+        with self.nostdout():
+            modeljson = um.export_model(["Personal"], resolver=dict(evidence_filter="all"))
+        # printjson(modeljson)
+
+        with self.nostdout():
+            um.import_model(context=["Temp"], partial_model=modeljson)
+
+        self.fail("Currently, exporting a model doesn't export views")
+
+    def test_goals(self):
+        """
+        Add goals to alice's model as well as some evidence
+        """
+        cobj = Personis_base.Component(Identifier="fitness", component_type="goal", 
+                Description="My overall fitness", 
+                goals=[['Personal', 'Health', 'weight']], value_type="number")
+
+        # Add weight goal
+        res = self.um.mkcomponent(context=["Personal"], componentobj=cobj)
+        res = self.um.ask(context=['Personal'], view=['fitness'])
+        self.assertEqual(res[0].goals, [['Personal', 'Health', 'weight']])
+
+        # Add evidence to weight goal
+        ev = Personis_base.Evidence(evidence_type="explicit", value=17)
+        self.um.tell(context=["Personal"], componentid='fitness', evidence=ev)
+        reslist = self.um.ask(context=["Personal"], view=['fitness'], 
+                resolver={'evidence_filter':"all"})
+        self.assertEqual(reslist[0].value, 17)
+
+        # Add extra 'steps' goal
+        goals = reslist[0].goals
+        goals.append(["Personal", "Health", "steps"])
+        self.um.set_goals(context=["Personal"], componentid='fitness', goals=goals)
+        reslist = self.um.ask(context=["Personal"], view=['fitness'], resolver={'evidence_filter':"all"})
+        self.assertEqual(reslist[0].goals, [['Personal', 'Health', 'weight'], 
+            ['Personal', 'Health', 'steps']])
 
 if __name__ == '__main__':
 
