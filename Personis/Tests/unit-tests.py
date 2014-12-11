@@ -544,7 +544,11 @@ class SimpleTests(unittest.TestCase):
         # printjson(modeljson)
 
     def test_output_json2(self):
-
+        """
+        Export a json model, import into a temporary model and then
+        compare the two
+        """
+        # TODO: Currently exporting json doesn't export views/subscriptions
         # export a model sub tree to JSON
 
         um = Personis_a.Access(model="Alice", modeldir=self.modeldir, 
