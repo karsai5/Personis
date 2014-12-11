@@ -2,6 +2,7 @@
 /Personis/output_alice
 MyHealth_key.pem
 Personis/Tests/crondb.dat
+.github-todos
 
 
 *.pyc
