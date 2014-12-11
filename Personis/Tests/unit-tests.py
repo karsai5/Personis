@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-import Personis_a
-import Personis_base
 import cStringIO
 import contextlib
 import os
@@ -8,19 +6,64 @@ import random
 import shutil
 import sys
 import unittest
+import json
 
+import Personis_a
+import Personis_base
 from Personis_util import printcomplist, showobj
 from Personis_mkmodel import *
 
 class SimpleTests(unittest.TestCase):
 
+    @classmethod
+    def setUpClass(cls):
+
+        # connect to personis instance
+        cls.mname = 'Alice'
+        cls.user = 'alice'
+        cls.password = 'secret'
+        cls.mfile = os.path.dirname(os.path.realpath(__file__)) + '/../Src/Modeldefs/user'
+        cls.modeldir = os.path.dirname(os.path.realpath(__file__)) + '/Models'
+
     def setUp(self):
-        deleteModels('Alice')
-        with nostdout():
-            createAliceModel()
-        self.um = Personis_base.Access(model='Alice', modeldir='Tests/Models', 
+        self.deleteModels('Alice')
+        with self.nostdout():
+            self.createAliceModel()
+        self.um = Personis_base.Access(model='Alice', modeldir=self.modeldir, 
                 authType='user', auth='alice:secret')
         self.give_alice_details()
+
+    @contextlib.contextmanager
+    def nostdout(self):
+        """
+        Can be used to run function without printint to std out.
+        eg. 
+            with nostdout():
+                foo()
+        """
+        save_stdout = sys.stdout
+        sys.stdout = cStringIO.StringIO()
+        yield
+        sys.stdout = save_stdout
+        
+    def createAliceModel(self):
+        """
+        Creates the alice model, outputs a lot of text, recommemded you use with
+        the nostdout contextmanager
+        """
+        modelserver = None
+        auth = self.user + ':' + self.password
+        mkmodel(model=self.mname, mfile=self.mfile, modeldir=self.modeldir, user=self.user, 
+                password=self.password)
+
+    def deleteModels(self,modelName):
+        """
+        Deletes the passed model name from the model directory
+        """
+        deletedir = self.modeldir + '/' + modelName
+        if os.path.exists(deletedir):
+            shutil.rmtree(deletedir)
+
 
     def give_alice_details(self):
         """
@@ -56,8 +99,6 @@ class SimpleTests(unittest.TestCase):
         """
         Ask for a series of pieces of evidence from the model using custom views
         """
-        self.um = Personis_base.Access(model='Alice', modeldir='Tests/Models', 
-                authType='user', auth='alice:secret')
 
         # 1. Ask for alices name
         reslist = self.um.ask(context=['Personal'], view='fullname')
@@ -97,9 +138,6 @@ class SimpleTests(unittest.TestCase):
         """
         Change Alice's name to Carrol
         """
-        # access model
-        self.um = Personis_base.Access(model='Alice', modeldir='Tests/Models', 
-                authType='user', auth='alice:secret')
 
         # create a piece of evidence with Carrol as value
         ev = Personis_base.Evidence(evidence_type="explicit", value="Carrol")
@@ -274,10 +312,8 @@ class SimpleTests(unittest.TestCase):
             print "Views: %s" % str(theviews)
             print "Subscriptions: %s" % str(thesubs)
 
-        um = Personis_base.Access(model="Alice", modeldir='Tests/Models', authType='user', auth='alice:secret')
-
         # 1. Show the root context
-        info = um.ask(context=[""], showcontexts=True)
+        info = self.um.ask(context=[""], showcontexts=True)
         # printAskContext(info) # uncomment for more details about context
         (cobjlist, contexts, theviews, thesubs) = info # enter tuple info in variables
         self.assertEqual(contexts, ['Location', 'Personal', 'Temp', 'Work', 
@@ -286,7 +322,7 @@ class SimpleTests(unittest.TestCase):
         self.assertEqual(thesubs, {})
 
         # 2. Show the Personal context
-        info = um.ask(context=["Personal"], showcontexts=True)
+        info = self.um.ask(context=["Personal"], showcontexts=True)
         # printAskContext(info) # uncomment for more details about context
         (cobjlist, contexts, theviews, thesubs) = info # enter tuple info in variables
         self.assertEqual(contexts, ['Health'])
@@ -302,11 +338,11 @@ class SimpleTests(unittest.TestCase):
         try:
             key = Personis_base.generate_app_key("MyHealth")
             fingerprint = Personis_base.generate_app_fingerprint(key)
-            Personis_base.AppRequestAuth(model='Alice', modeldir='Tests/Models', 
+            Personis_base.AppRequestAuth(model='Alice', modeldir=self.modeldir, 
                     app='MyHealth', key=key.publickey().exportKey(), 
                     description="My Health Manager")
         except Exception as e:
-            print "App auth request failed with exception : %s\n" % (e)
+            self.fail("App auth request failed with exception : %s\n" % (e))
 
         # Check fingerprints match
         requests = self.um.listrequests()
@@ -353,47 +389,141 @@ class SimpleTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             perms = self.um.getpermission(context=['Personal'], app='withings')
 
+    def test_using_permissions_to_access_data(self):
+        """ 
+        AS an extension of the test_create_app_and_test_permissions test, this test
+        creates and app and registers it, it then uses this app to access different,
+        bits of information such as name etc. and confirms that the correct 
+        information is given in accordance to the apps permissions
+        """
 
-@contextlib.contextmanager
-def nostdout():
-    """
-    Can be used to run function without printint to std out.
-    eg. 
-        with nostdout():
-            foo()
-    """
-    save_stdout = sys.stdout
-    sys.stdout = cStringIO.StringIO()
-    yield
-    sys.stdout = save_stdout
-    
-def createAliceModel():
-    """
-    Creates the alice model, outputs a lot of text, recommemded you use with
-    the nostdout contextmanager
-    """
-    modelserver = None
-    auth = user + ':' + password
-    print modeldir + '/Alice'
-    mkmodel(model=mname, mfile=mfile, modeldir=modeldir, user=user, 
-            password=password)
+        # Check there's no registered apps
+        apps = self.um.listapps()
+        self.assertEqual(apps, {})
 
-def deleteModels(modelName):
-    """
-    Deletes the passed model name from the model directory
-    """
-    deletedir = modeldir + '/' + modelName
-    if os.path.exists(deletedir):
-        shutil.rmtree(deletedir)
+        # Try and set permissions on a context for an unregistered app:
+        with self.assertRaises(ValueError):
+            self.um.setpermission(context=["Personal"], app="MyHealth", 
+                    permissions={'ask':True, 'tell':False})
+
+        # Register MyHealth
+        try:
+            key = Personis_base.generate_app_key("MyHealth")
+            fingerprint = Personis_base.generate_app_fingerprint(key)
+            Personis_base.AppRequestAuth(model='Alice', modeldir=self.modeldir, 
+                    app='MyHealth', key=key.publickey().exportKey(), 
+                    description="My Health Manager")
+        except Exception as e:
+            self.fail("App auth request failed with exception : %s\n" % (e))
+
+        requests = self.um.listrequests()
+        fingerprint2 = requests['MyHealth']['fingerprint']
+
+        if fingerprint2 != fingerprint:
+            self.fail("Fingerprints don't match!")
+
+        appdetails = self.um.registerapp(app="MyHealth", desc="My Health Manager", 
+                fingerprint=fingerprint)
+
+        apps = self.um.listapps()
+        self.assertEqual(apps, {'MyHealth': {'description': 'My Health Manager'}})
+
+        # Give the MyHealth app permissions
+        self.um.setpermission(context=["Personal"], app="MyHealth", 
+                permissions={'ask':False, 'tell':False, 
+                    "resolvers":["last1", "goal"]})
+
+        # Check those permissions
+        perms = self.um.getpermission(context=["Personal"], app="MyHealth")
+        self.assertEqual(perms, {'ask': False, 'resolvers': ['last1', 'goal'], 
+            'tell': False})
+
+        # Change name to Alex Jones
+        ev = Personis_base.Evidence(evidence_type="explicit", value="Alex")
+        self.um.tell(context=["Personal"], componentid='firstname', evidence=ev)
+        ev = Personis_base.Evidence(evidence_type="explicit", value="Jones")
+        self.um.tell(context=["Personal"], componentid='lastname', evidence=ev)
+
+        # Ask for Alice's fullname as owner (should work)
+        # Check the name was changed
+        reslist = self.um.ask(context=["Personal"], view='fullname')
+        self.assertEqual(len(reslist), 2)
+        self.assertEqual(reslist[0].value, 'Alex')
+        self.assertEqual(reslist[1].value, 'Jones')
+
+        # Access Alice's model as an unregistered App
+        self.um = None
+        with self.assertRaises(ValueError):
+            unregistered_key = Personis_base.generate_app_key("MyHealth")
+            auth = 'withings:' + Personis_base.generate_app_signature('withings', unregistered_key)
+            self.um = Personis_base.Access(model="Alice", modeldir=self.modeldir, authType='app', auth=auth)
+
+        # Access Alice's model as a registered App (should work)
+        self.um = None
+        try:
+            auth = 'MyHealth:' + Personis_base.generate_app_signature('MyHealth', key) 
+            self.um = Personis_base.Access(model="Alice", modeldir=self.modeldir, authType='app', auth=auth)
+        except Exception as e:
+            self.fail("Access failed with exception : %s\n" % (e))
+
+        # Ask for Alice's fullname as app 'MyHealth' (should NOT work)
+        with self.assertRaises(ValueError):
+            reslist = self.um.ask(context=["Personal"], view='fullname')
+
+        # Set ask permission for the 'MyHealth' app
+        self.um = None
+        self.um = Personis_base.Access(model="Alice", modeldir=self.modeldir, authType='user', auth='alice:secret')
+        self.um.setpermission(context=["Personal"], app="MyHealth", permissions={'ask':True, 'tell':False})
+
+
+        # Ask for Alice's fullname as app 'MyHealth' (should work now)
+        self.um = None
+        auth = 'MyHealth:' + Personis_base.generate_app_signature('MyHealth', key) 
+        self.um = Personis_base.Access(model="Alice", modeldir=self.modeldir, authType='app', auth=auth)
+        try:
+            reslist = self.um.ask(context=["Personal"], view='fullname')
+            self.assertEqual(len(reslist), 2)
+            self.assertEqual(reslist[0].value, 'Alex')
+            self.assertEqual(reslist[1].value, 'Jones')
+        except Exception as e:
+            self.fail("ask failed with exception : %s\n" % (e))
+
+        # Now try and tell a new value for first name (should NOT work)
+        ev = Personis_base.Evidence(evidence_type="explicit", value="Fred")
+        with self.assertRaises(ValueError):
+            self.um.tell(context=["Personal"], componentid='firstname', evidence=ev)
+
+        # Delete the 'MyHealth' app while NOT accessing as owner
+        with self.assertRaises(ValueError):
+            self.um.deleteapp(app="MyHealth")
+
+        # Delete the 'MyHealth' app while accessing as owner
+        self.um = None
+        self.um = Personis_base.Access(model="Alice", modeldir=self.modeldir, authType='user', auth='alice:secret')
+        try:
+            self.um.deleteapp(app="MyHealth")
+        except Exception as e:
+            self.fail("deleteapp failed with exception : %s\n" % (e))
+
+        # List the registered apps (should be none)
+        apps = self.um.listapps()
+        self.assertEqual(apps,{})
+
+    def test_add_json_content_to_component(self):
+
+        print "add a JSON encoded value to a component"
+        fullname = {'firstname':'Alice', 'lastname':'Smith'}
+        # create a piece of evidence with json encoded value
+        ev = Personis_base.Evidence(evidence_type="explicit", value=json.dumps(fullname))
+        self.um.tell(context=["People"], componentid='fullname', evidence=ev)
+
+        print "==================================================================="
+        print "Now check the evidence list "
+        reslist = self.um.ask(context=["People"], view=['fullname'])
+        printcomplist(reslist, printev = "yes")
 
 
 if __name__ == '__main__':
-    # connect to personis instance
-    mname = 'Alice'
-    user = 'alice'
-    password = 'secret'
-    mfile = 'Src/Modeldefs/user'
-    modeldir = 'Tests/Models'
 
     suite = unittest.TestLoader().loadTestsFromTestCase(SimpleTests)
     unittest.TextTestRunner(verbosity=2).run(suite)
