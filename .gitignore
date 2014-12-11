@@ -1,6 +1,7 @@
 /Personis/Tests/Models/
 /Personis/output_alice
 MyHealth_key.pem
+Personis/Tests/crondb.dat
 
 
 *.pyc
