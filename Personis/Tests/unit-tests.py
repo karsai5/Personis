@@ -164,7 +164,7 @@ class SimpleTests(unittest.TestCase):
         self.assertEqual(reslist[0].value, 4)
 
     def test_complex_view(self):
-        # TODO: work out what this is doing
+        # Todo: Work out what complex_view test is doing
         # print "ask for the components in a more complex view of a preference and Alice's first name"
         # ev = Personis_base.Evidence(evidence_type="explicit", value=4)
         # self.um.tell(context=["Preferences", "Music","Jazz","Artists"], 
